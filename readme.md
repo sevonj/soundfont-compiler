@@ -29,7 +29,7 @@ You should be somewhat familiar with the SoundFont 2 format.
 
 </details>
 
-Example project structure:
+### Example project structure:
 ```
 .
 ├── instruments/
