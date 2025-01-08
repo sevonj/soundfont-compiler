@@ -43,6 +43,4 @@ You should be somewhat familiar with the SoundFont 2 format.
 └── SoundFont.toml
 ```
 
-
-Presets, instruments, and samples 
 Samples are loose WAVE files. Presets, instruments and parameters are defined in TOML-files. See the example project.
