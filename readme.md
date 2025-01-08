@@ -6,7 +6,7 @@ SoundFont Compiler is a command-line tool for creating soundfonts. Unlike most o
 
 ## Why?
 
-Breaking the soundfont into separate files and defining parameters in a text-based format makes collaboration and version control much easier.
+Breaking the soundfont into separate files and defining parameters in a text-based format makes collaboration and version control much easier. No more 
 
 ## Current state
 
@@ -17,15 +17,16 @@ The project in its current state is a barely working proof of concept. The outpu
 You should be somewhat familiar with the SoundFont 2 format.
 
 <details>
-  <summary>tl;dr</summary>
-  
+  <summary>The quickest explanation</summary>
+
+  Hierarchy: 
   `preset -> instrument -> sample`
   
   - A soundfont contains one or more presets.
   - A preset contains one or more instruments.
   - An instrument contains one or more samples.
 
-  The names can be confusing. The preset is the unit visible outside. In this context, when you choose a "sound," you're choosing a preset, not an instrument. Instruments are _internal_ to the soundfont. A preset may layer multiple instruments over each other to create a specific sound.
+  The naming can be confusing. The preset is the unit visible from outside. In this context, when you choose a "patch," or "sound," you're choosing a preset, not an instrument. Instruments are internal to the soundfont. A preset may layer multiple instruments over each other to create a specific sound, and instruments can do the same with samples.
 
 </details>
 
@@ -44,4 +45,4 @@ You should be somewhat familiar with the SoundFont 2 format.
 
 
 Presets, instruments, and samples 
-Samples are loose WAVE file. Presets, instruments and parameters are defined in TOML-files. See the example project.
+Samples are loose WAVE files. Presets, instruments and parameters are defined in TOML-files. See the example project.
