@@ -31,12 +31,16 @@ fn main() {
         }
     }
 
-    for sample in font.get_sample_headers() {
-        log_sample(sample);
+    for preset in font.get_presets() {
+        log_preset(preset);
     }
 
     for inst in font.get_instruments() {
         log_instrument(inst);
+    }
+
+    for sample in font.get_sample_headers() {
+        log_sample(sample);
     }
 
     //println!("{:02x?}", font.get_wave_data())
@@ -58,24 +62,28 @@ fn log_sample(sample: &rustysynth::SampleHeader) {
 fn log_instrument(inst: &rustysynth::Instrument) {
     print!("Instrument - ");
     println!("{}", inst.get_name());
-    println!("Regions: {}", inst.get_regions().len());
+    println!("  Zones: {}", inst.get_regions().len());
     for region in inst.get_regions() {
-        println!("  region: ");
-        println!("      sample_start: {}", region.get_sample_start());
-        println!("      sample_end: {}", region.get_sample_end());
+        println!("      i-zone: ");
+        println!("          sample_id: {}", region.get_sample_id());
+        println!("          sample_start: {}", region.get_sample_start());
+        println!("          sample_end: {}", region.get_sample_end());
         println!(
-            "      sample_start_loop: {}",
+            "          sample_start_loop: {}",
             region.get_sample_start_loop()
         );
-        println!("      sample_end_loop: {}", region.get_sample_end_loop());
+        println!(
+            "          sample_end_loop: {}",
+            region.get_sample_end_loop()
+        );
     }
 }
 fn log_preset(preset: &rustysynth::Preset) {
     print!("Preset - ");
     println!("{}", preset.get_name());
-    println!("Regions: {}", preset.get_regions().len());
+    println!("  Zones: {}", preset.get_regions().len());
     for region in preset.get_regions() {
-        println!("  region: ");
-        println!("      instrument: {}", region.get_instrument_id());
+        println!("      p-zone: ");
+        println!("          inst_id: {}", region.get_instrument_id());
     }
 }

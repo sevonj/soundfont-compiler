@@ -1,0 +1,12 @@
+# Guitar sample preset
+
+name = "Guitar"
+
+midi_preset = 0
+midi_bank = 0
+library = 0
+genre = 0
+morphology = 0
+
+[zones.guitar]
+instrument = "Guitar.toml"

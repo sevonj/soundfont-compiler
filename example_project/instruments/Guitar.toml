@@ -1,0 +1,28 @@
+# Guitar sample instrument
+
+name = "PopGuitar"
+
+[zones.global]
+sample = "pop_r.wav"
+
+#startloop = 8
+#endloop = 8
+original_pitch = 60
+pitch_correction = 0
+
+[zones.guitar]
+sample = "guitar.wav"
+
+#startloop = 8
+#endloop = 8
+original_pitch = 60
+pitch_correction = 0
+
+
+[zones.pop]
+sample = "pop_l.wav"
+
+#startloop = 8
+#endloop = 8
+original_pitch = 60
+pitch_correction = 0

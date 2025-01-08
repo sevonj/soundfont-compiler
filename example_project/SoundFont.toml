@@ -1,0 +1,6 @@
+authors = "sevonj"
+copyright = "This soundfont by sevonj is marked with CC0 1.0"
+comments = "This is an example project."
+
+
+presets = ["Guitar.toml"]
