@@ -2,7 +2,7 @@
 
 ## What?
 
-SoundFont Compiler is a command-line tool for creating soundfonts. Unlike most other tools, it isn't designed around a workflow of editing soundfonts. Instead, the binary soundfont file is generated from "source code" comprising text and audio files.
+SoundFont Compiler is a command-line tool for creating soundfonts. Unlike most other tools, it isn't designed around a workflow of editing soundfonts. Instead, the soundfont binary is generated from "source code" comprising text and audio files.
 
 ## Why?
 
