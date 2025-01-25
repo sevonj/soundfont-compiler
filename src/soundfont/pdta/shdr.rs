@@ -1,59 +1,34 @@
 use riff::{ChunkContents, ChunkId};
 
-pub enum SampleError {
-    SampleTooShort,
-    LoopTooShort,
-    LoopNotEnoughLead,
-    LoopNotEnoughTail,
-    TerminalNotNull,
-}
-impl std::fmt::Display for SampleError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SampleError::SampleTooShort => {
-                write!(f, "Sample data must be at least 48 data points long.")
-            }
-            SampleError::LoopTooShort => {
-                write!(f, "The loop must be at least 32 data points long.")
-            }
-            SampleError::LoopNotEnoughLead => {
-                write!(f, "There must be at least 8 data points before startloop")
-            }
-            SampleError::LoopNotEnoughTail => {
-                write!(f, "There must be at least 8 data points after endloop")
-            }
-            SampleError::TerminalNotNull => {
-                write!(f, "Terminal sample must be null.")
-            }
-        }
-    }
-}
+use crate::soundfont::SoundfontError;
 
 #[derive(Debug, Clone)]
 pub struct SampleList {
     pub contents: Vec<SampleHeader>,
 }
 
-impl From<SampleList> for ChunkContents {
-    fn from(value: SampleList) -> Self {
-        println!("Packing shdr: {value:?}");
-
-        let mut contents = vec![];
-        for header in value.contents {
-            let _ = header.validate();
-            contents.append(&mut header.as_bytes());
-        }
-
-        assert_ne!(contents.len(), 0);
-        assert_eq!(contents.len() % 46, 0);
-
-        ChunkContents::Data(ChunkId { value: *b"shdr" }, contents)
+impl Default for SampleList {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl SampleList {
     pub fn new() -> Self {
         Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let mut contents = vec![];
+        for header in &self.contents {
+            let _ = header.validate();
+            contents.append(&mut header.to_bytes());
+        }
+
+        assert_ne!(contents.len(), 0);
+        assert_eq!(contents.len() % 46, 0);
+
+        ChunkContents::Data(ChunkId { value: *b"shdr" }, contents)
     }
 }
 
@@ -72,7 +47,7 @@ pub struct SampleHeader {
 }
 
 impl SampleHeader {
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
 
         let mut name_bytes = self.name.as_bytes().to_vec();
@@ -95,7 +70,7 @@ impl SampleHeader {
         bytes
     }
 
-    pub fn validate(&self) -> Result<(), SampleError> {
+    pub fn validate(&self) -> Result<(), SoundfontError> {
         // Terminal entry. "End of Samples",
         if self.name == "EOS" {
             if self.start != 0
@@ -108,29 +83,29 @@ impl SampleHeader {
                 || self.sample_link != 0
                 || self.sample_type != 0
             {
-                return Err(SampleError::TerminalNotNull);
+                return Err(SoundfontError::SampleTerminalNotNull);
             }
             return Ok(());
         }
 
         // Sample must be at least 48 data points long.
         if self.end - self.start < 48 {
-            return Err(SampleError::SampleTooShort);
+            return Err(SoundfontError::SampleTooShort);
         }
 
         // The loop must be at least 32 data points long.
         if self.endloop - self.startloop < 32 {
-            return Err(SampleError::LoopTooShort);
+            return Err(SoundfontError::SampleLoopTooShort);
         }
 
         // There must be at least 8 data points before startloop
         if self.startloop - self.start < 8 {
-            return Err(SampleError::LoopNotEnoughLead);
+            return Err(SoundfontError::SampleLoopNotEnoughLead);
         }
 
         // There must be at least 8 data points after endloop
         if self.end - self.endloop < 8 {
-            return Err(SampleError::LoopNotEnoughTail);
+            return Err(SoundfontError::SampleLoopNotEnoughTail);
         }
 
         Ok(())

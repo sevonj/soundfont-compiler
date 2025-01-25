@@ -5,15 +5,9 @@ pub struct Instruments {
     pub contents: Vec<Instrument>,
 }
 
-impl From<Instruments> for ChunkContents {
-    fn from(value: Instruments) -> Self {
-        println!("Packing inst: {value:?}");
-
-        let mut contents = vec![];
-        for gen in value.contents {
-            contents.append(&mut gen.as_bytes());
-        }
-        ChunkContents::Data(ChunkId { value: *b"inst" }, contents)
+impl Default for Instruments {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -21,25 +15,24 @@ impl Instruments {
     pub fn new() -> Self {
         Self { contents: vec![] }
     }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let mut contents = vec![];
+        for gen in &self.contents {
+            contents.append(&mut gen.to_bytes());
+        }
+        ChunkContents::Data(ChunkId { value: *b"inst" }, contents)
+    }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Instrument {
     pub name: String,
     pub inst_bag_idx: u16,
 }
 
-impl Default for Instrument {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
-            inst_bag_idx: Default::default(),
-        }
-    }
-}
-
 impl Instrument {
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
 
         let mut name_bytes = self.name.as_bytes().to_vec();

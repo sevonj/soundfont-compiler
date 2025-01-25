@@ -6,11 +6,19 @@ pub struct InstModList {
     pub contents: Vec<InstrumentMod>,
 }
 
-impl From<InstModList> for ChunkContents {
-    fn from(value: InstModList) -> Self {
-        println!("Packing imod: {value:?}");
+impl Default for InstModList {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-        let mut contents = vec![];
+impl InstModList {
+    pub fn new() -> Self {
+        Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let contents = vec![];
         //for gen in value.contents {
         //    contents.append(&mut gen.as_bytes());
         //}
@@ -18,12 +26,6 @@ impl From<InstModList> for ChunkContents {
         assert_eq!(contents.len() % 4, 0);
 
         ChunkContents::Data(ChunkId { value: *b"pmod" }, contents)
-    }
-}
-
-impl InstModList {
-    pub fn new() -> Self {
-        Self { contents: vec![] }
     }
 }
 

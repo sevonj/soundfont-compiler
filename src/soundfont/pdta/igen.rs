@@ -7,25 +7,27 @@ pub struct InstGenList {
     pub contents: Vec<InstrumentGen>,
 }
 
-impl From<InstGenList> for ChunkContents {
-    fn from(value: InstGenList) -> Self {
-        println!("Packing igen: {value:?}");
-
-        let mut contents = vec![];
-        for gen in value.contents {
-            contents.append(&mut gen.as_bytes());
-        }
-
-        assert_ne!(contents.len(), 0);
-        assert_eq!(contents.len() % 4, 0);
-
-        ChunkContents::Data(ChunkId { value: *b"igen" }, contents)
+impl Default for InstGenList {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl InstGenList {
     pub fn new() -> Self {
         Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let mut contents = vec![];
+        for gen in &self.contents {
+            contents.append(&mut gen.to_bytes());
+        }
+
+        assert_ne!(contents.len(), 0);
+        assert_eq!(contents.len() % 4, 0);
+
+        ChunkContents::Data(ChunkId { value: *b"igen" }, contents)
     }
 }
 
@@ -36,11 +38,11 @@ pub struct InstrumentGen {
 }
 
 impl InstrumentGen {
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
 
         bytes.append(&mut self.sf_gen_oper.to_le_bytes().to_vec());
-        bytes.append(&mut self.gen_amount.as_bytes());
+        bytes.append(&mut self.gen_amount.to_bytes());
 
         assert_eq!(bytes.len(), 4);
 

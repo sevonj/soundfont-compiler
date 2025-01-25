@@ -7,25 +7,27 @@ pub struct PresetGenList {
     pub contents: Vec<PresetGen>,
 }
 
-impl From<PresetGenList> for ChunkContents {
-    fn from(value: PresetGenList) -> Self {
-        println!("Packing pgen: {value:?}");
-
-        let mut contents = vec![];
-        for gen in value.contents {
-            contents.append(&mut gen.as_bytes());
-        }
-
-        assert_ne!(contents.len(), 0);
-        assert_eq!(contents.len() % 4, 0);
-
-        ChunkContents::Data(ChunkId { value: *b"pgen" }, contents)
+impl Default for PresetGenList {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl PresetGenList {
     pub fn new() -> Self {
         Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let mut contents = vec![];
+        for gen in &self.contents {
+            contents.append(&mut gen.to_bytes());
+        }
+
+        assert_ne!(contents.len(), 0);
+        assert_eq!(contents.len() % 4, 0);
+
+        ChunkContents::Data(ChunkId { value: *b"pgen" }, contents)
     }
 }
 
@@ -36,11 +38,11 @@ pub struct PresetGen {
 }
 
 impl PresetGen {
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
 
         bytes.append(&mut self.sf_gen_oper.to_le_bytes().to_vec());
-        bytes.append(&mut self.gen_amount.as_bytes());
+        bytes.append(&mut self.gen_amount.to_bytes());
 
         assert_eq!(bytes.len(), 4);
 

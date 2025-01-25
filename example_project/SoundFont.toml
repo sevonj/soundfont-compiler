@@ -1,6 +1,10 @@
+# Required
+name = "Example Soundfont"
+
+# Optional
 authors = "sevonj"
 copyright = "This soundfont by sevonj is marked with CC0 1.0"
 comments = "This is an example project."
 
-
+# Required
 presets = ["Guitar.toml"]

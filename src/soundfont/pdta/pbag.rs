@@ -5,25 +5,27 @@ pub struct PresetBag {
     pub contents: Vec<PresetZone>,
 }
 
-impl From<PresetBag> for ChunkContents {
-    fn from(value: PresetBag) -> Self {
-        println!("Packing pbag: {value:?}");
-
-        let mut contents = vec![];
-        for bag in value.contents {
-            contents.append(&mut bag.as_bytes());
-        }
-
-        assert_ne!(contents.len(), 0);
-        assert_eq!(contents.len() % 4, 0);
-
-        ChunkContents::Data(ChunkId { value: *b"pbag" }, contents)
+impl Default for PresetBag {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
 impl PresetBag {
     pub fn new() -> Self {
         Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
+        let mut contents = vec![];
+        for bag in &self.contents {
+            contents.append(&mut bag.to_bytes());
+        }
+
+        assert_ne!(contents.len(), 0);
+        assert_eq!(contents.len() % 4, 0);
+
+        ChunkContents::Data(ChunkId { value: *b"pbag" }, contents)
     }
 }
 
@@ -38,7 +40,7 @@ impl PresetZone {
         Self { gen_idx, mod_idx }
     }
 
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
         bytes.append(&mut self.gen_idx.to_le_bytes().to_vec());
         bytes.append(&mut self.mod_idx.to_le_bytes().to_vec());

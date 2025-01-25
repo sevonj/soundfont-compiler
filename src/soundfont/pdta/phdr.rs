@@ -5,13 +5,21 @@ pub struct PresetHeaders {
     pub contents: Vec<PresetHeader>,
 }
 
-impl From<PresetHeaders> for ChunkContents {
-    fn from(value: PresetHeaders) -> Self {
-        println!("Packing phdr: {value:?}");
+impl Default for PresetHeaders {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
+impl PresetHeaders {
+    pub fn new() -> Self {
+        Self { contents: vec![] }
+    }
+
+    pub fn to_riff(&self) -> ChunkContents {
         let mut contents = vec![];
-        for header in value.contents {
-            contents.append(&mut header.as_bytes());
+        for header in &self.contents {
+            contents.append(&mut header.to_bytes());
         }
 
         assert_ne!(contents.len(), 0);
@@ -21,13 +29,7 @@ impl From<PresetHeaders> for ChunkContents {
     }
 }
 
-impl PresetHeaders {
-    pub fn new() -> Self {
-        Self { contents: vec![] }
-    }
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PresetHeader {
     /// Must be unique, ASCII, and at most 256B long.
     pub name: String,
@@ -45,22 +47,8 @@ pub struct PresetHeader {
     pub morphology: u32,
 }
 
-impl Default for PresetHeader {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
-            preset: Default::default(),
-            bank: Default::default(),
-            pbag_idx: Default::default(),
-            library: 0,
-            genre: 0,
-            morphology: 0,
-        }
-    }
-}
-
 impl PresetHeader {
-    pub fn as_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Vec<u8> {
         let mut bytes = vec![];
 
         let mut name_bytes = self.name.as_bytes().to_vec();

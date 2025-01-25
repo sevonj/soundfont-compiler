@@ -1,34 +1,66 @@
+mod args;
 pub mod compiler;
 pub mod soundfont;
 
+use clap::Parser;
 use std::fs::File;
 
+use args::Args;
 use compiler::FontData;
 
 fn main() {
-    let mut fontdata = FontData::new();
-    fontdata.load();
+    let args = Args::parse();
+    println!("Compiling project from given path: {}", args.path);
 
+    print!("Parsing project.........");
+    let mut fontdata = match FontData::read(&args.path) {
+        Ok(fontdata) => {
+            println!("OK");
+            fontdata
+        }
+        Err(e) => {
+            println!("ERR");
+            println!("{e}");
+            return;
+        }
+    };
+
+    print!("Generating soundfont....");
     let soundfont = fontdata.generate_soundfont();
-    let riff = soundfont.create_riff();
+    println!("OK");
 
+    print!("Packing into RIFF.......");
+    let riff = soundfont.to_riff();
+    println!("OK");
+
+    print!("Saving file.............");
     let mut file = File::create("test_output.sf2").expect("filecreatefail");
     riff.write(&mut file).expect("fail");
+    println!("OK");
+
+    println!("Finished");
 
     let mut open_file = File::open("test_output.sf2").unwrap();
     // open_file = File::open("SM64SF_V2.sf2").unwrap();
 
+    if !args.check {
+        return;
+    }
+
     println!("Result:");
-    let font;
-    match rustysynth::SoundFont::new(&mut open_file) {
+    let font = match rustysynth::SoundFont::new(&mut open_file) {
         Ok(val) => {
             println!("was ok");
-            font = val
+            val
         }
         Err(e) => {
             println!("ERR: {e}");
             return;
         }
+    };
+
+    if !args.verbose {
+        return;
     }
 
     for preset in font.get_presets() {
@@ -59,6 +91,7 @@ fn log_sample(sample: &rustysynth::SampleHeader) {
     println!("  link: {}", sample.get_link());
     println!("  sample_type: {}", sample.get_sample_type());
 }
+
 fn log_instrument(inst: &rustysynth::Instrument) {
     print!("Instrument - ");
     println!("{}", inst.get_name());
@@ -78,6 +111,7 @@ fn log_instrument(inst: &rustysynth::Instrument) {
         );
     }
 }
+
 fn log_preset(preset: &rustysynth::Preset) {
     print!("Preset - ");
     println!("{}", preset.get_name());
